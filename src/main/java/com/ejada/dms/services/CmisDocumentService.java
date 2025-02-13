@@ -34,18 +34,18 @@ public class CmisDocumentService {
         properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
         //Retrieves the parent folder object using the folder path
             System.out.println("**************Generate parent folder **************");
-
-            Folder root = (Folder) cmisUtils.getSession().getRootFolder();
-            System.out.println("**************Root************** " + root);
-            ItemIterable<CmisObject> children =  cmisUtils.getSession().getRootFolder().getChildren();
-            // Get an iterator
-            Iterator<CmisObject> iterator = children.iterator();
-            // Iterate using the iterator
-            while (iterator.hasNext()) {
-                CmisObject child = iterator.next();
-                System.out.println("**************Child************** " + child);
-
-            }
+//
+//            Folder root = (Folder) cmisUtils.getSession().getRootFolder();
+//            System.out.println("**************Root************** " + root);
+//            ItemIterable<CmisObject> children =  cmisUtils.getSession().getRootFolder().getChildren();
+//            // Get an iterator
+//            Iterator<CmisObject> iterator = children.iterator();
+//            // Iterate using the iterator
+//            while (iterator.hasNext()) {
+//                CmisObject child = iterator.next();
+//                System.out.println("**************Child************** " + child);
+//
+//            }
         Folder parent = (Folder) cmisUtils.getSession().getObjectByPath(folderPath);
             System.out.println("**************Done generating parent folder **************");
         // Creates the document in the folder by uploading the file content as a ContentStream.
