@@ -48,6 +48,7 @@ dms:
     userName: SVC_SmartContractSIT
     password: 2G_Qb@64#oj#qU
     repository: ALRajhiDevOS2
+    atomUrl: http://10.11.34.161:9081/openfncmis/atom11
     url: http://10.11.34.161:9081/openfncmis/services?wsdl
     path: /v1/document-management
     bufferLength: 10240

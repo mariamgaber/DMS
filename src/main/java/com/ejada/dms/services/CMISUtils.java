@@ -1,6 +1,7 @@
 package com.ejada.dms.services;
 
 import com.ejada.commons.errors.exceptions.ErrorCodeException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -10,34 +11,34 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
-import org.apache.chemistry.opencmis.commons.impl.MimeTypes;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.reflections.Reflections.log;
-
+import org.springframework.stereotype.Component;
+@Slf4j
+@Component
 public class CMISUtils {
     @Value("${dms.document.userName}")
-    private static String userName;
+    private  String userName;
     @Value("${dms.document.password}")
-    private static String password;
+    private  String password;
+    @Value("${dms.document.atomUrl}")
+    private  String atomUrl;
     @Value("${dms.document.url}")
-    private static String url;
+    private  String url;
     @Value("${dms.document.repository}")
-    private static String repository;
+    private  String repository;
     @Value("${dms.document.bufferLength}")
-    private static int bufferLength;
-    private static Session session = null;
-    public static Session getSession() {
+    private  int bufferLength;
+    private  Session session = null;
+    public Session getSession() {
         Map<String, String> parameter = new HashMap<String, String>();
 
         try{
@@ -45,13 +46,13 @@ public class CMISUtils {
         if (session == null) {
             SessionFactory factory = SessionFactoryImpl.newInstance();
             // user credentials
-            parameter.put(SessionParameter.USER, "SVC_SmartContractSIT");
-            parameter.put(SessionParameter.PASSWORD, "2G_Qb@64#oj#qU");
+            parameter.put(SessionParameter.USER, userName);
+            parameter.put(SessionParameter.PASSWORD, password);
             //connection settings.
-            parameter.put(SessionParameter.BROWSER_URL, "http://10.11.34.161:9081/openfncmis/services?wsdl");
-            parameter.put(SessionParameter.ATOMPUB_URL, "http://10.11.34.161:9081/openfncmis/atom11");
+            parameter.put(SessionParameter.BROWSER_URL, url);
+            parameter.put(SessionParameter.ATOMPUB_URL, atomUrl);
             parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
-            parameter.put(SessionParameter.REPOSITORY_ID, "ALRajhiDevOS2");
+            parameter.put(SessionParameter.REPOSITORY_ID, repository);
 
             System.out.println(parameter);
             session = factory.createSession(parameter);
@@ -68,7 +69,7 @@ public class CMISUtils {
         }
     }
 
-    public static ContentStream getFileContentStream(String path, String fileExtension) throws IOException {
+    public  ContentStream getFileContentStream(String path, String fileExtension) throws IOException {
         try (InputStream stream = CMISUtils.class.getClassLoader().getResourceAsStream(path))
         {
             if (stream == null) {
@@ -91,7 +92,7 @@ public class CMISUtils {
     }
 
 
-    public static void writeDocContentToFile(Document doc, String downloadPath) {
+    public  void writeDocContentToFile(Document doc, String downloadPath) {
         if (doc.getContentStream() != null) {
             InputStream stream = doc.getContentStream().getStream();
             if (stream != null) {
@@ -122,7 +123,7 @@ public class CMISUtils {
     }
 
     //get property by name, if it doesn't exist return null
-    public static Property getPropertyByName(List<Property<?>> props, String name){
+    public  Property getPropertyByName(List<Property<?>> props, String name){
         Iterator iterator = props.iterator();
         while (iterator.hasNext()){
             Property property = (Property)iterator.next();
@@ -135,7 +136,7 @@ public class CMISUtils {
 
 
     //get string property in XML format
-    public static String getStringXML (Property<?> prop)
+    public  String getStringXML (Property<?> prop)
     {
         String propertyXml = "<" + prop.getQueryName() + ">"
                 + prop.getValueAsString() + "</" + prop.getQueryName() + ">";
@@ -143,7 +144,7 @@ public class CMISUtils {
     }
 
     //get properties in xml format
-    public static String getXMLProperties (List<Property<?>> props, List<String> docProperties)
+    public  String getXMLProperties (List<Property<?>> props, List<String> docProperties)
     {
         String xml = "<?xml version=\"1.0\"encoding=\"UTF-8\"?> <PropertySet>";
         for (String propStr: docProperties) {

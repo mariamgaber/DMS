@@ -22,14 +22,14 @@ import static com.ejada.dms.constants.FailureQueues.DOWNLOAD_DOCUMENT_FAILURE_QU
 @Validated
 @Slf4j
 public class DmsController {
-
+     private final CmisDocumentService cmisDocumentService;
     @PostMapping("/create")
     @FailureQueueDescriptor(failureQueue = DOWNLOAD_DOCUMENT_FAILURE_QUEUE)
     public ResponseEntity<String> createDocument() {
         try {
             String path = "Keycloak Material.pdf";
             Map<String, String> properties = new HashMap<>();
-            String documentId = CmisDocumentService.createDocumentFromPath(path, properties);
+            String documentId = cmisDocumentService.createDocumentFromPath(path, properties);
             return ResponseEntity.ok(documentId);
         } catch (ErrorCodeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
@@ -40,7 +40,7 @@ public class DmsController {
     @FailureQueueDescriptor(failureQueue = DOWNLOAD_DOCUMENT_FAILURE_QUEUE)
     public ResponseEntity<Document> retrieveDocument(@PathVariable String docId, @RequestParam(required = false) String downloadPath) {
         try {
-            Document document = CmisDocumentService.retrieveDocumentById(docId, downloadPath);
+            Document document = cmisDocumentService.retrieveDocumentById(docId, downloadPath);
             return ResponseEntity.ok(document);
         } catch (ErrorCodeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -52,7 +52,7 @@ public class DmsController {
     @FailureQueueDescriptor(failureQueue = DOWNLOAD_DOCUMENT_FAILURE_QUEUE)
     public ResponseEntity<String> updateDocument(@PathVariable String docId, @RequestParam String path, @RequestBody Map<String, String> properties) {
         try {
-            String updatedDocId = CmisDocumentService.updateDocumentById(path, docId, properties);
+            String updatedDocId = cmisDocumentService.updateDocumentById(path, docId, properties);
             return ResponseEntity.ok(updatedDocId);
         } catch (ErrorCodeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
