@@ -35,6 +35,18 @@ public class DmsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    @PostMapping("/content")
+    @FailureQueueDescriptor(failureQueue = DOWNLOAD_DOCUMENT_FAILURE_QUEUE)
+    public ResponseEntity<String> create() {
+        try {
+            String c = "SGVsbG8sIFdvcmxkIQ==";
+            Map<String, String> properties = new HashMap<>();
+            String documentId = cmisDocumentService.createDocumentFromContent(properties, c.getBytes());
+            return ResponseEntity.ok(documentId);
+        } catch (ErrorCodeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 
     @GetMapping("/retrieve/{docId}")
     @FailureQueueDescriptor(failureQueue = DOWNLOAD_DOCUMENT_FAILURE_QUEUE)

@@ -12,7 +12,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -27,32 +27,23 @@ public class CmisDocumentService {
     // path: The file path of the document content to be uploaded.
     // properties: A map containing metadata properties for the document.
     public  String createDocumentFromPath(String path, Map<String, String> properties) {
+
         System.out.println("**************Enter create document **************");
         try{
-            //To ensure only reading Document
-            System.out.println("**************Reading File**************"+ cmisUtils.getFileContentStream(path, "txt"));
-        properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
+            // set the document class
+            String fileName = Paths.get(path).getFileName().toString();
+            properties.put(PropertyIds.NAME, fileName);
+            properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
+
         //Retrieves the parent folder object using the folder path
             System.out.println("**************Generate parent folder **************");
-//
-//            Folder root = (Folder) cmisUtils.getSession().getRootFolder();
-//            System.out.println("**************Root************** " + root);
-//            ItemIterable<CmisObject> children =  cmisUtils.getSession().getRootFolder().getChildren();
-//            // Get an iterator
-//            Iterator<CmisObject> iterator = children.iterator();
-//            // Iterate using the iterator
-//            while (iterator.hasNext()) {
-//                CmisObject child = iterator.next();
-//                System.out.println("**************Child************** " + child);
-//
-//            }
         Folder parent = (Folder) cmisUtils.getSession().getObjectByPath(folderPath);
             System.out.println("**************Done generating parent folder **************");
         // Creates the document in the folder by uploading the file content as a ContentStream.
         // VersioningState can be MAJOR or MINOR
         //TODo: we need to convert base64 format to content stream..
             System.out.println("**************Create Document **************");
-        Document newDoc = parent.createDocument(properties, cmisUtils.getFileContentStream(path, "txt"), VersioningState.MAJOR);
+        Document newDoc = parent.createDocument(properties, cmisUtils.getFileContentStream(path), VersioningState.MAJOR);
             System.out.println("**************Done Creating Document**************");
         //Returns the ID of the newly created document
         return newDoc.getId();
@@ -66,6 +57,29 @@ public class CmisDocumentService {
             throw new ErrorCodeException("UNEXPECTED_ERROR_CREATING_DOCUMENT");
         }
     }
+    public String createDocumentFromContent(Map<String, String> properties, byte[] content) {
+
+      try{
+          properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
+
+        System.out.println("**************Generate parent folder **************");
+        Folder parent = (Folder) cmisUtils.getSession().getObjectByPath(folderPath);
+        System.out.println("**************Done generating parent folder **************");
+
+        System.out.println("**************Create Document **************");
+        Document newDoc = parent.createDocument(properties, cmisUtils.getFileContentStream(content), VersioningState.MAJOR);
+        System.out.println("**************Done Creating Document**************");
+
+        return newDoc.getId();
+    }catch (CmisBaseException e) {
+          System.out.println("**************Error1 Creating Document **************");
+          throw new ErrorCodeException("CMIS_FAILED_CREATING_DOCUMENT");
+      } catch (Exception e) {
+          System.out.println("**************Error2 Creating  Document**************");
+          log.error("Unexpected error while creating document: {}", e.getMessage());
+          throw new ErrorCodeException("UNEXPECTED_ERROR_CREATING_DOCUMENT");
+      }
+      }
 
 
     // Purpose: Fetches a document by its ID, writes its content to a specified by its path, and prints its properties in XML format.
@@ -110,7 +124,7 @@ public class CmisDocumentService {
             // properties: A Map<String, String> containing the updated metadata or properties for the document.
             // cmisUtils.getFileContentStream(path, "txt"): A helper method from cmisUtils that creates a ContentStream object from the file located at path. This represents the new content to be stored in the document.
             // "major version": A comment or label indicating this update creates a major version.
-            pwc.checkIn(true, properties, cmisUtils.getFileContentStream(path, "txt"), "major version");
+            pwc.checkIn(true, properties, cmisUtils.getFileContentStream(path), "major version");
         } catch (CmisBaseException e) {
             e.printStackTrace();
             System.out.println("checkIn failed, trying to cancel the checkout");

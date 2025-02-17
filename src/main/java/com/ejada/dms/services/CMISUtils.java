@@ -68,8 +68,19 @@ public class CMISUtils {
             throw new ErrorCodeException("FAILED_CREATING_SESSION");
         }
     }
+    // If you have the content
+    public ContentStream getFileContentStream(byte[] content) {
+        if (content == null || content.length == 0) {
+            throw new ErrorCodeException("FILE_CONTENT_IS_EMPTY");
+        }
 
-    public  ContentStream getFileContentStream(String path, String fileExtension) throws IOException {
+        InputStream stream = new ByteArrayInputStream(content);
+        return new ContentStreamImpl("fileName",
+                BigInteger.valueOf(content.length),
+                "application/pdf",
+                stream);
+    }
+    public  ContentStream getFileContentStream(String path) throws IOException {
         try (InputStream stream = CMISUtils.class.getClassLoader().getResourceAsStream(path))
         {
             if (stream == null) {
