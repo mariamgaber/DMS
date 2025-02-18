@@ -9,6 +9,7 @@ import org.apache.chemistry.opencmis.client.api.SessionFactory;
 import org.apache.chemistry.opencmis.client.runtime.SessionFactoryImpl;
 import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
@@ -56,6 +57,11 @@ public class CMISUtils {
 
             System.out.println(parameter);
             session = factory.createSession(parameter);
+            // Print repository info
+            RepositoryInfo repoInfo = session.getRepositoryInfo();
+            System.out.println("Connected to repository: " + repoInfo.getName());
+            System.out.println("Repository ID: " + repoInfo.getId());
+            System.out.println("Repository Description: " + repoInfo.getDescription());
         }
         return session;
         } catch (CmisBaseException e) {

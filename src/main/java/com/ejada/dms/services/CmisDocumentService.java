@@ -20,7 +20,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CmisDocumentService {
     private final CMISUtils cmisUtils;
-    private final String DOCUMENT_CLASS_SYMBOLIC_NAME = "Document";
+    private final String DOCUMENT_CLASS_SYMBOLIC_NAME = "SmartContract";
     //root folder path of dms
     private final  String folderPath = "/SmartContract";
 
@@ -58,7 +58,6 @@ public class CmisDocumentService {
         }
     }
     public String createDocumentFromContent(Map<String, String> properties, byte[] content) {
-
       try{
           properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
           System.out.println("*************"+cmisUtils.getFileContentStream(content));
