@@ -58,6 +58,7 @@ public class CMISUtils {
             System.out.println(parameter);
             session = factory.createSession(parameter);
             // Print repository info
+            System.out.println("*********Get Session Info from get session ***********");
             RepositoryInfo repoInfo = session.getRepositoryInfo();
             System.out.println("Connected to repository: " + repoInfo.getName());
             System.out.println("Repository ID: " + repoInfo.getId());

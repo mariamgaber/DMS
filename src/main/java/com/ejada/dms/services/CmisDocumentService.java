@@ -6,9 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.chemistry.opencmis.client.api.*;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
+import org.apache.chemistry.opencmis.commons.data.ContentStream;
+import org.apache.chemistry.opencmis.commons.data.RepositoryInfo;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.VersioningState;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
+import org.apache.chemistry.opencmis.commons.impl.Base64;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,19 +32,30 @@ public class CmisDocumentService {
     public  String createDocumentFromPath(String path, Map<String, String> properties) {
 
         System.out.println("**************Enter create document **************");
-        try{
+        ContentStream inputStream = null;
+        try {
             // set the document class
+            inputStream = cmisUtils.getFileContentStream(path);
+            if (inputStream == null) {
+                throw new ErrorCodeException("Failed to get InputStream for file: " + path);
+            }
             String fileName = Paths.get(path).getFileName().toString();
             properties.put(PropertyIds.NAME, fileName);
             properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
 
         //Retrieves the parent folder object using the folder path
+
             System.out.println("**************Generate parent folder **************");
         Folder parent = (Folder) cmisUtils.getSession().getObjectByPath(folderPath);
             System.out.println("**************Done generating parent folder **************");
         // Creates the document in the folder by uploading the file content as a ContentStream.
         // VersioningState can be MAJOR or MINOR
         //TODo: we need to convert base64 format to content stream..
+            System.out.println("*********Get Session Info Before creating document***********");
+            RepositoryInfo repoInfo = cmisUtils.getSession().getRepositoryInfo();
+            System.out.println("Connected to repository: " + repoInfo.getName());
+            System.out.println("Repository ID: " + repoInfo.getId());
+            System.out.println("Repository Description: " + repoInfo.getDescription());
             System.out.println("**************Create Document **************");
         Document newDoc = parent.createDocument(properties, cmisUtils.getFileContentStream(path), VersioningState.MAJOR);
             System.out.println("**************Done Creating Document**************");
