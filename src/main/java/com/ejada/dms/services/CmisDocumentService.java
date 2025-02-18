@@ -61,7 +61,7 @@ public class CmisDocumentService {
 
       try{
           properties.put(PropertyIds.OBJECT_TYPE_ID, DOCUMENT_CLASS_SYMBOLIC_NAME);
-
+          System.out.println("*************"+cmisUtils.getFileContentStream(content));
         System.out.println("**************Generate parent folder **************");
         Folder parent = (Folder) cmisUtils.getSession().getObjectByPath(folderPath);
         System.out.println("**************Done generating parent folder **************");
